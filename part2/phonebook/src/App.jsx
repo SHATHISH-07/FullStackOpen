@@ -51,8 +51,8 @@ const App = () => {
         personService
           .update(existingPerson.id, newObj)
           .then((updatedPerson) => {
-            setPersons(
-              persons.map((person) =>
+            setPersons((prevPersons) =>
+              prevPersons.map((person) =>
                 person.id !== existingPerson.id ? person : updatedPerson
               )
             );
@@ -67,15 +67,15 @@ const App = () => {
                 `Information for ${newObj.name} has already been removed from the server`,
                 "error"
               );
-
-              setPersons(persons.filter((p) => p.id !== existingPerson.id));
+              setPersons((prevPersons) =>
+                prevPersons.filter((p) => p.id !== existingPerson.id)
+              );
             } else {
               notify(
-                `Failed to update ${newObj.name}. Error: ${error.message}`,
+                `Failed to update ${newObj.name}. Error: ${error.response.data.error}`,
                 "error"
               );
             }
-            return;
           })
           .finally(() => {
             setNewName("");
@@ -91,7 +91,7 @@ const App = () => {
         })
         .catch((error) => {
           notify(
-            `Failed to add ${newObj.name}. Error: ${error.message}`,
+            `Failed to add ${newObj.name}. Error: ${error.response.data.error}`,
             "error"
           );
         })
@@ -133,7 +133,15 @@ const App = () => {
           notify(`${personToDelete.name} was deleted successfully`, "success");
         })
         .catch((error) => {
-          notify(`Unable to delete ${personToDelete.name}`, "error");
+          if (error.response && error.response.status === 404) {
+            notify(
+              `Information for ${personToDelete.name} has already been removed from the server`,
+              "error"
+            );
+            setPersons(persons.filter((p) => p.id !== id));
+          } else {
+            notify(`Unable to delete ${personToDelete.name}`, "error");
+          }
         });
     }
   };
