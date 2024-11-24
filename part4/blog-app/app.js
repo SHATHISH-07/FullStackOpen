@@ -7,6 +7,7 @@ const loginRouter = require("./controller/login");
 const logger = require("./utils/logger");
 const config = require("./utils/config");
 const userRouter = require("./controller/users");
+const resetRouter = require("./controller/reset");
 const middleware = require("./utils/middleware");
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(middleware.tokenExtractor);
 app.use("/api/blogs", middleware.userExtractor, blogRouter);
 app.use("/api/users", userRouter);
 app.use("/api/login", loginRouter);
+app.use("/api/reset", resetRouter);
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 

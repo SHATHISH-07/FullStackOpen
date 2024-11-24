@@ -31,14 +31,9 @@ const getBlog = async (req, res, next) => {
 
 const createBlog = async (req, res, next) => {
   try {
-    const { title, author, url, likes = 0, userId } = req.body;
+    const { title, author, url, likes = 0 } = req.body;
 
-    const decodedToken = jwt.verify(req.token, process.env.SECRET);
-    if (!decodedToken.id) {
-      return res.status(401).json({ error: "token invalid" });
-    }
     const user = req.user;
-
     if (!title || !url) {
       return res.status(400).json({ error: "title and url are required" });
     }
@@ -47,13 +42,25 @@ const createBlog = async (req, res, next) => {
       return res.status(400).json({ error: "invalid user" });
     }
 
-    const blog = new Blog({ title, author, url, likes, user: user.id });
+    const blog = new Blog({
+      title,
+      author,
+      url,
+      likes,
+      user: user._id,
+    });
+
     const savedBlog = await blog.save();
 
     user.blogs = user.blogs.concat(savedBlog._id);
     await user.save();
 
-    res.status(201).json(savedBlog.toJSON());
+    const populatedBlog = await Blog.findById(savedBlog._id).populate("user", {
+      username: 1,
+      name: 1,
+    });
+
+    res.status(201).json(populatedBlog.toJSON());
   } catch (err) {
     next(err);
   }

@@ -1,0 +1,15 @@
+{
+  "name": "blog-e2e-tests",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test"  
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}
