@@ -7,4 +7,9 @@ const getAll = async () => {
   return response.data;
 };
 
-export default { getAll };
+const create = async (userData) => {
+  const response = await axios.post(baseUrl, userData); // Send user data to backend
+  return response.data; // Return the created user data
+};
+
+export default { getAll, create }; // Make sure create is exported

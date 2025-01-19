@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios from 'axios';
 
-const baseUrl = "/api/login";
+const baseUrl = '/api/login';
 
 const login = async (credentials) => {
   try {
@@ -9,10 +9,10 @@ const login = async (credentials) => {
   } catch (error) {
     if (error.response && error.response.status === 401) {
       // Handle invalid username or password
-      throw new Error("Invalid username or password");
+      throw new Error('Invalid username or password');
     } else {
       // Handle other types of errors
-      throw new Error("An error occurred while logging in");
+      throw new Error('An error occurred while logging in');
     }
   }
 };

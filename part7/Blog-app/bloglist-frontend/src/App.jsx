@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Link, useParams } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import BlogView from './components/BlogView';
 import Blog from './components/Blog';
 import blogService from './services/blogs';
 import Users from './components/Users';
 import userService from './services/users';
 import loginService from './services/login';
+import SignupForm from './components/SignupForm';
 import Notification from './components/Notification';
 import NewBlog from './components/NewBlog';
 import LoginForm from './components/LoginForm';
@@ -19,6 +20,8 @@ const App = () => {
   const [notificationType, setNotificationType] = useState(null);
   const [showNewBlogForm, setShowNewBlogForm] = useState(false);
   const [users, setUsers] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser');
@@ -68,7 +71,38 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogAppUser');
     setUser(null);
+    blogService.setToken(null);
     setNotification('Logged out', 'success');
+  };
+
+  const handleSignup = async ({ username, password, name }) => {
+    try {
+      const user = await userService.create({ username, password, name });
+
+      console.log('User created:', user);
+
+      // Now log the user in using the created credentials
+      const loggedInUser = await loginService.login({ username, password });
+
+      // Store the logged-in user and token
+      window.localStorage.setItem(
+        'loggedBlogAppUser',
+        JSON.stringify(loggedInUser)
+      );
+      blogService.setToken(loggedInUser.token);
+
+      // Set user state
+      setUser(loggedInUser);
+
+      // Notify success
+      setNotification('Signup and login successful', 'success');
+
+      // Redirect to home
+      navigate('/');
+    } catch (error) {
+      console.error('Error during signup or login:', error); // Log error
+      setNotification('Error signing up', 'error');
+    }
   };
 
   const addNewBlog = async (blogObject) => {
@@ -128,11 +162,29 @@ const App = () => {
   return (
     <>
       {!user && (
-        <LoginForm
-          handleLogin={handleLogin}
-          notificationMessage={notificationMessage}
-          notificationType={notificationType}
-        />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <LoginForm
+                handleLogin={handleLogin}
+                notificationMessage={notificationMessage}
+                notificationType={notificationType}
+              />
+            }
+          />
+
+          <Route
+            path="/signup"
+            element={
+              <SignupForm
+                handleSignup={handleSignup}
+                notificationMessage={notificationMessage}
+                notificationType={notificationType}
+              />
+            }
+          />
+        </Routes>
       )}
       {user && (
         <div>
@@ -149,7 +201,7 @@ const App = () => {
               path="/"
               element={
                 <>
-                  <h1>Blogs</h1>
+                  <h1>All Blogs</h1>
 
                   <ul>
                     {blogs.map((blog) => (
@@ -170,6 +222,7 @@ const App = () => {
                 </>
               }
             />
+
             <Route
               path="/blogs/:id"
               element={
@@ -181,12 +234,12 @@ const App = () => {
                 />
               }
             />
-            ;
+
             <Route
               path="/blogs"
               element={
                 <>
-                  <h1>Blogs</h1>
+                  <h1>My Blogs</h1>
                   <NewBlog
                     createNewBlog={addNewBlog}
                     setShowNewBlogForm={setShowNewBlogForm}

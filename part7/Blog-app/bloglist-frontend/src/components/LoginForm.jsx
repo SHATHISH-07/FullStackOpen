@@ -1,15 +1,16 @@
-import React, { useState } from "react";
-import "./LoginForm.css";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './LoginForm.css';
 
 const LoginForm = ({ handleLogin, notificationMessage, notificationType }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const onSubmit = (event) => {
     event.preventDefault();
     handleLogin({ username, password });
-    setUsername("");
-    setPassword("");
+    setUsername('');
+    setPassword('');
   };
 
   return (
@@ -44,6 +45,11 @@ const LoginForm = ({ handleLogin, notificationMessage, notificationType }) => {
         <button type="submit" className="login-button">
           login
         </button>
+        <div>
+          <p>
+            Don't have an account? <Link to="/signup">Sign up</Link>
+          </p>
+        </div>
       </div>
     </form>
   );

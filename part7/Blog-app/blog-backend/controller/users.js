@@ -46,8 +46,12 @@ userRouter.post("/", async (req, res) => {
 
   const user = new User({ username, passwordHashed, name });
 
-  const savedUser = await user.save();
-  res.status(201).send(savedUser);
+  try {
+    const savedUser = await user.save();
+    res.status(201).json(savedUser); // Ensure the response is the newly created user
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create user" });
+  }
 });
 
 module.exports = userRouter;
